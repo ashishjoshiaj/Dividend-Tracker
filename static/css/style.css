@@ -351,6 +351,13 @@ body {
     border: 1px solid var(--border-subtle);
     overflow-x: auto;
     max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.timeframe-tabs::-webkit-scrollbar {
+    display: none;
 }
 
 .tf-btn {
@@ -484,11 +491,13 @@ body {
     position: relative;
     min-height: 380px;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .dividend-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     text-align: left;
 }
 
@@ -502,6 +511,9 @@ body {
     letter-spacing: 0.05em;
     border-bottom: 1px solid var(--border-subtle);
     white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
 
 .dividend-table td {
@@ -509,6 +521,24 @@ body {
     border-bottom: 1px solid #1a1a1e;
     font-size: 0.86rem;
     vertical-align: middle;
+    white-space: nowrap;
+}
+
+/* Sticky first column for mobile & multi-device table scanning */
+.dividend-table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background: #0e0e11;
+    border-right: 1px solid var(--border-subtle);
+}
+
+.dividend-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: #121215;
+    border-right: 1px solid var(--border-subtle);
 }
 
 .dividend-table tbody tr {
@@ -516,6 +546,10 @@ body {
 }
 
 .dividend-table tbody tr:hover {
+    background: #16161a;
+}
+
+.dividend-table tbody tr:hover td:first-child {
     background: #16161a;
 }
 
@@ -1002,19 +1036,297 @@ body {
 }
 
 /* ==========================================================================
-   Responsive Breakpoints
+   Comprehensive Multi-Device Responsive System
+   Supports: Desktops, Laptops, Tablets (iPad/Android), Mobile (iPhone/Android),
+   and Foldable/Small screens
    ========================================================================== */
+
+/* --- 1. Laptops & Compact Desktops (<= 1200px) --- */
 @media (max-width: 1200px) {
     .kpi-grid {
         grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    
+    .toolbar {
+        gap: 10px;
     }
 }
 
+/* --- 2. Tablets & iPads (<= 992px) --- */
+@media (max-width: 992px) {
+    body {
+        padding: 16px;
+    }
+
+    .app-container {
+        gap: 12px;
+    }
+
+    .navbar {
+        padding: 12px 16px;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .timeframe-tabs {
+        width: 100%;
+    }
+
+    .search-sort-group {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .search-box {
+        flex: 1;
+    }
+
+    .search-box input {
+        width: 100%;
+    }
+
+    .modal-dialog {
+        max-width: 90vw;
+    }
+}
+
+/* --- 3. Small Tablets & Phablets (<= 768px) --- */
 @media (max-width: 768px) {
-    body { padding: 12px; }
-    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    .toolbar { flex-direction: column; align-items: stretch; }
-    .search-sort-group { flex-direction: column; align-items: stretch; }
-    .search-box input { width: 100%; }
-    .navbar { flex-direction: column; gap: 12px; align-items: stretch; }
+    body {
+        padding: 12px 10px;
+    }
+
+    .navbar {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+    }
+
+    .brand-text h1 {
+        font-size: 1.05rem;
+    }
+
+    .brand-sub {
+        font-size: 0.7rem;
+    }
+
+    .btn-primary {
+        padding: 7px 12px;
+        font-size: 0.78rem;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    /* Make Top Yield Card span full width in 2-column layout */
+    .kpi-card:last-child {
+        grid-column: span 2;
+    }
+
+    .kpi-card {
+        padding: 10px 12px;
+    }
+
+    .kpi-value {
+        font-size: 1.35rem;
+    }
+
+    .toolbar {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .search-sort-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .search-box input {
+        width: 100%;
+        font-size: 0.85rem;
+    }
+
+    .select-wrapper {
+        width: 100%;
+    }
+
+    .select-wrapper select {
+        width: 100%;
+    }
+
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dividend-table th,
+    .dividend-table td {
+        padding: 10px 12px;
+        font-size: 0.82rem;
+    }
+
+    .table-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 12px 14px;
+    }
+
+    .footer-info {
+        flex-wrap: wrap;
+        font-size: 0.75rem;
+    }
+
+    .modal-dialog {
+        width: 94vw;
+        max-height: 90vh;
+        margin: 10px;
+    }
+
+    .modal-header {
+        padding: 14px 16px;
+    }
+
+    .modal-body {
+        padding: 14px 16px;
+        gap: 14px;
+    }
+
+    .announcement-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .toast-container {
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
+    }
+
+    .toast {
+        text-align: center;
+        width: 100%;
+    }
+}
+
+/* --- 4. Mobile Phones (<= 480px) --- */
+@media (max-width: 480px) {
+    body {
+        padding: 8px 6px;
+    }
+
+    .navbar {
+        padding: 8px 10px;
+        border-radius: var(--radius-md);
+    }
+
+    .logo-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+    .brand-text h1 {
+        font-size: 0.95rem;
+    }
+
+    .brand-sub {
+        display: none;
+    }
+
+    #btn-refresh span {
+        display: none;
+    }
+
+    #btn-refresh {
+        padding: 6px 10px;
+    }
+
+    .kpi-title {
+        font-size: 0.68rem;
+    }
+
+    .kpi-value {
+        font-size: 1.25rem;
+    }
+
+    .kpi-meta {
+        font-size: 0.68rem;
+    }
+
+    .tf-btn {
+        padding: 5px 9px;
+        font-size: 0.74rem;
+    }
+
+    .count-pill {
+        font-size: 0.65rem;
+        padding: 1px 4px;
+    }
+
+    .dividend-table th {
+        padding: 8px 10px;
+        font-size: 0.7rem;
+    }
+
+    .dividend-table td {
+        padding: 9px 10px;
+        font-size: 0.78rem;
+    }
+
+    .symbol-badge {
+        font-size: 0.84rem;
+    }
+
+    .action-btn {
+        padding: 4px 8px;
+        font-size: 0.72rem;
+    }
+
+    .modal-header h2 {
+        font-size: 0.95rem;
+    }
+
+    .modal-badge {
+        font-size: 0.88rem;
+        padding: 4px 8px;
+    }
+
+    .announcement-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- 5. Ultra-Small / Foldable Screens (<= 340px) --- */
+@media (max-width: 340px) {
+    body {
+        padding: 4px;
+    }
+
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .kpi-card:last-child {
+        grid-column: span 1;
+    }
+
+    .navbar {
+        padding: 6px 8px;
+    }
 }
