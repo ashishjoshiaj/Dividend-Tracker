@@ -27,5 +27,5 @@ UPSTOX_TOKEN = os.environ.get("TOKEN") or _env.get("TOKEN", "")
 CACHE_TTL = 900
 
 # Server config
-SERVER_PORT = 5000
-SERVER_HOST = "127.0.0.1"
+SERVER_PORT = int(os.environ.get("PORT", 5000))
+SERVER_HOST = os.environ.get("HOST", "0.0.0.0")
