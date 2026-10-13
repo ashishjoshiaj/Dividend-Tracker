@@ -1,6 +1,7 @@
 import os
 import io
 import csv
+import gzip
 import datetime
 from flask import Flask, render_template, jsonify, request, send_file, Response
 
@@ -14,6 +15,46 @@ app = Flask(__name__)
 # Initialize client and manager
 client = UpstoxClient()
 manager = CorporateActionsManager(client)
+
+@app.after_request
+def optimize_response(response):
+    """Apply caching headers and gzip compression for high Lighthouse performance."""
+    # 1. Caching headers
+    if request.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+    elif request.path == "/favicon.ico":
+        response.headers["Cache-Control"] = "public, max-age=86400"
+    elif not response.headers.get("Cache-Control"):
+        response.headers["Cache-Control"] = "no-cache, must-revalidate"
+
+    # 2. Gzip Compression for text/json/css/js
+    accept_encoding = request.headers.get("Accept-Encoding", "")
+    if "gzip" not in accept_encoding.lower():
+        return response
+
+    if response.direct_passthrough:
+        return response
+
+    mimetype = response.mimetype or ""
+    if not (mimetype.startswith("text/") or mimetype in ["application/json", "application/javascript", "image/svg+xml"]):
+        return response
+
+    data = response.get_data()
+    if len(data) < 500:
+        return response
+
+    gzip_buffer = io.BytesIO()
+    with gzip.GzipFile(mode="wb", fileobj=gzip_buffer) as gz:
+        gz.write(data)
+
+    compressed_data = gzip_buffer.getvalue()
+    if len(compressed_data) < len(data):
+        response.set_data(compressed_data)
+        response.headers["Content-Encoding"] = "gzip"
+        response.headers["Content-Length"] = len(compressed_data)
+        response.headers["Vary"] = "Accept-Encoding"
+
+    return response
 
 @app.route("/")
 def index():
