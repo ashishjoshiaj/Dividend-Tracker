@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dividend Tracker for Indian Stock Markets</title>
+    <meta name="description" content="Track upcoming dividends across 5, 10, 20, and 30-day timeframes for Indian equity stocks.">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon.png">
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation Bar -->
+        <header class="navbar">
+            <div class="nav-brand">
+                <a href="/" class="logo-link" title="Dividend Tracker">
+                    <img src="/static/favicon.png" alt="Dividend Tracker" class="logo-icon">
+                </a>
+                <div class="brand-text">
+                    <h1>Dividend Tracker</h1>
+                    <p class="brand-sub">Corporate Actions & Dividend Scanner</p>
+                </div>
+            </div>
+
+            <!-- Features Navigation -->
+<!--            <div class="nav-features">
+                <button class="nav-tab active" id="tab-feature-1">
+                    <span class="tab-dot"></span>
+                    <span>Dividend Scanner</span>
+                </button>
+                <button class="nav-tab tab-future" id="tab-feature-2" title="Ready for your next requested feature!">
+                    <span class="tab-plus">+</span>
+                    <span>Feature 2: Ready for Input</span>
+                </button>
+            </div>-->
+
+            <div class="nav-actions">
+                <button class="btn btn-primary" id="btn-refresh" title="Force refresh live data">
+                    <svg class="icon spin-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                    </svg>
+                    <span>Sync Live Data</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI Metric Cards Grid -->
+        <section class="kpi-grid">
+            <div class="kpi-card" data-filter="5">
+                <div class="kpi-header">
+                    <span class="kpi-title">5 Days</span>
+                </div>
+                <div class="kpi-value" id="kpi-5d">-</div>
+                <div class="kpi-meta">Ex-date within 5 days</div>
+            </div>
+
+            <div class="kpi-card" data-filter="10">
+                <div class="kpi-header">
+                    <span class="kpi-title">10 Days</span>
+                </div>
+                <div class="kpi-value" id="kpi-10d">-</div>
+                <div class="kpi-meta">Ex-date within 10 days</div>
+            </div>
+
+            <div class="kpi-card" data-filter="20">
+                <div class="kpi-header">
+                    <span class="kpi-title">20 Days</span>
+                </div>
+                <div class="kpi-value" id="kpi-20d">-</div>
+                <div class="kpi-meta">Ex-date within 20 days</div>
+            </div>
+
+            <div class="kpi-card" data-filter="30">
+                <div class="kpi-header">
+                    <span class="kpi-title">30 Days</span>
+                </div>
+                <div class="kpi-value" id="kpi-30d">-</div>
+                <div class="kpi-meta">Ex-date within 30 days</div>
+            </div>
+
+            <div class="kpi-card" data-filter="45">
+                <div class="kpi-header">
+                    <span class="kpi-title">45 Days</span>
+                </div>
+                <div class="kpi-value" id="kpi-45d">-</div>
+                <div class="kpi-meta">Ex-date within 45 days</div>
+            </div>
+
+            <div class="kpi-card" data-filter="60">
+                <div class="kpi-header">
+                    <span class="kpi-title">60 Days</span>
+                </div>
+                <div class="kpi-value" id="kpi-60d">-</div>
+                <div class="kpi-meta">Ex-date within 60 days</div>
+            </div>
+
+            <div class="kpi-card" data-filter="75">
+                <div class="kpi-header">
+                    <span class="kpi-title">75 Days</span>
+                </div>
+                <div class="kpi-value" id="kpi-75d">-</div>
+                <div class="kpi-meta">Ex-date within 75 days</div>
+            </div>
+
+            <div class="kpi-card" data-filter="90">
+                <div class="kpi-header">
+                    <span class="kpi-title">90 Days</span>
+                </div>
+                <div class="kpi-value" id="kpi-90d">-</div>
+                <div class="kpi-meta">Quarterly view</div>
+            </div>
+
+            <div class="kpi-card highlight-kpi">
+                <div class="kpi-header">
+                    <span class="kpi-title">Top Yield Stock</span>
+                    <span class="kpi-tag">Yield</span>
+                </div>
+                <div class="kpi-value highlight" id="kpi-top-yield">-</div>
+                <div class="kpi-meta" id="kpi-top-stock">No stocks analyzed</div>
+            </div>
+        </section>
+
+        <!-- Main Content Area -->
+        <main class="main-card">
+            <!-- Filter Bar -->
+            <div class="toolbar">
+                <!-- Timeframe Selector Tabs -->
+                <div class="timeframe-tabs">
+                    <button class="tf-btn active" data-timeframe="all">
+                        <span>All Upcoming</span>
+                        <span class="count-pill" id="pill-all">-</span>
+                    </button>
+                    <button class="tf-btn" data-timeframe="5">
+                        <span>5 Days</span>
+                        <span class="count-pill" id="pill-5">-</span>
+                    </button>
+                    <button class="tf-btn" data-timeframe="10">
+                        <span>10 Days</span>
+                        <span class="count-pill" id="pill-10">-</span>
+                    </button>
+                    <button class="tf-btn" data-timeframe="20">
+                        <span>20 Days</span>
+                        <span class="count-pill" id="pill-20">-</span>
+                    </button>
+                    <button class="tf-btn" data-timeframe="30">
+                        <span>30 Days</span>
+                        <span class="count-pill" id="pill-30">-</span>
+                    </button>
+                    <button class="tf-btn" data-timeframe="45">
+                        <span>45 Days</span>
+                        <span class="count-pill" id="pill-45">-</span>
+                    </button>
+                    <button class="tf-btn" data-timeframe="60">
+                        <span>60 Days</span>
+                        <span class="count-pill" id="pill-60">-</span>
+                    </button>
+                    <button class="tf-btn" data-timeframe="75">
+                        <span>75 Days</span>
+                        <span class="count-pill" id="pill-75">-</span>
+                    </button>
+                    <button class="tf-btn" data-timeframe="90">
+                        <span>90 Days</span>
+                        <span class="count-pill" id="pill-90">-</span>
+                    </button>
+                    <button class="tf-btn" data-timeframe="recent">
+                        <span>Past 30 Days</span>
+                    </button>
+                </div>
+
+                <!-- Secondary Filters -->
+                <div class="search-sort-group">
+                    <div class="search-box">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="input-search" placeholder="Search Symbol or Company...">
+                        <button class="btn-clear" id="btn-clear-search">&times;</button>
+                    </div>
+
+                    <div class="select-wrapper">
+                        <select id="select-sort">
+                            <option value="urgency">Sort: Days Left (Urgent First)</option>
+                            <option value="yield-desc">Sort: Yield % (High to Low)</option>
+                            <option value="div-desc">Sort: Dividend ₹ (High to Low)</option>
+                            <option value="ex-date">Sort: Ex-Date (Chronological)</option>
+                            <option value="symbol">Sort: Symbol (A-Z)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-secondary" id="btn-export-csv" title="Download CSV report">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-container">
+                <table class="dividend-table">
+                    <thead>
+                        <tr>
+                            <th>Stock Symbol</th>
+                            <th>Current Price (LTP)</th>
+                            <th>Announced Div</th>
+                            <th>Annual Div / Share</th>
+                            <th>Dividend Yield</th>
+                            <th>Ex-Dividend Date</th>
+                            <th>Record Date</th>
+                            <th>Timeframe</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Loaded dynamically via JavaScript -->
+                    </tbody>
+                </table>
+
+                <!-- Loading State -->
+                <div class="state-overlay hidden" id="loading-overlay">
+                    <div class="loader-spinner"></div>
+                    <p class="loader-text">Scanning corporate actions...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div class="state-empty hidden" id="empty-state">
+                    <div class="empty-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                    <h3>No dividend records found</h3>
+                    <p>There are no dividend announcements matching your selected timeframe or search criteria.</p>
+                    <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+                </div>
+            </div>
+
+            <!-- Table Footer Stats -->
+            <div class="table-footer">
+                <div class="footer-info">
+                    <span id="footer-count">Showing 0 stocks</span>
+                    <span class="bullet">•</span>
+                    <span id="footer-updated">Last sync: Just now</span>
+                </div>
+                <div class="disclaimer">
+                    Ex-dividend date is the cutoff date to buy shares for dividend entitlement.
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Company Detail / Track Record Modal -->
+    <div class="modal-backdrop hidden" id="detail-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <div class="modal-badge" id="modal-symbol">-</div>
+                    <div>
+                        <h2 id="modal-company-name">-</h2>
+                        <p class="modal-sub" id="modal-isin">-</p>
+                    </div>
+                </div>
+                <button class="modal-close" id="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Current Announcement Highlight -->
+                <div class="current-announcement-card">
+                    <h4>Current Announced Dividend & Yield Metrics</h4>
+                    <div class="announcement-stats">
+                        <div class="astat">
+                            <span class="astat-label">Announced Dividend</span>
+                            <span class="astat-val" id="modal-div-amount">-</span>
+                        </div>
+                        <div class="astat">
+                            <span class="astat-label">Annual Div / Share</span>
+                            <span class="astat-val" id="modal-annual-div">-</span>
+                        </div>
+                        <div class="astat">
+                            <span class="astat-label">Dividend Yield (Annual)</span>
+                            <span class="astat-val" id="modal-div-yield">-</span>
+                        </div>
+                        <div class="astat">
+                            <span class="astat-label">Ex-Dividend Date</span>
+                            <span class="astat-val" id="modal-ex-date">-</span>
+                        </div>
+                        <div class="astat">
+                            <span class="astat-label">Record Date</span>
+                            <span class="astat-val" id="modal-rec-date">-</span>
+                        </div>
+                    </div>
+                    <div class="announcement-purpose">
+                        <span class="purpose-label">Formula:</span>
+                        <span class="purpose-text">Dividend Yield = (Annual Dividends Per Share ÷ Price Per Share) × 100</span>
+                    </div>
+                    <div class="announcement-purpose" style="margin-top: 6px;">
+                        <span class="purpose-label">Exchange Subject:</span>
+                        <span id="modal-subject" class="purpose-text">-</span>
+                    </div>
+                </div>
+
+                <!-- Historical Dividend Track Record -->
+                <div class="history-section">
+                    <h4>Historical Dividend Track Record</h4>
+                    <div class="history-table-wrapper">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Event / Type</th>
+                                    <th>Ex-Date</th>
+                                    <th>Amount (₹)</th>
+                                    <th>Record Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-history-tbody">
+                                <tr>
+                                    <td colspan="4" class="text-center">Loading dividend history...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
