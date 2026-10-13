@@ -18,8 +18,25 @@ manager = CorporateActionsManager(client)
 
 @app.after_request
 def optimize_response(response):
-    """Apply caching headers and gzip compression for high Lighthouse performance."""
-    # 1. Caching headers
+    """Apply caching headers, gzip compression, and security headers for production."""
+    # 1. Security Headers
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
+    # Content Security Policy (CSP)
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self' 'https://fonts.googleapis.com' 'unsafe-inline'; "
+        "font-src 'self' 'https://fonts.gstatic.com'; "
+        "img-src 'self' data:; "
+        "connect-src 'self';"
+    )
+    response.headers["Content-Security-Policy"] = csp
+
+    # 2. Caching headers
     if request.path.startswith("/static/"):
         response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
     elif request.path == "/favicon.ico":
@@ -69,9 +86,23 @@ def favicon():
 @app.route("/api/dividends")
 def get_dividends():
     """Fetch dividends with optional filtering by timeframe, yield, and search."""
-    timeframe = request.args.get("timeframe", "all")
-    min_yield = float(request.args.get("min_yield", 0.0))
-    search_query = request.args.get("search", "").strip().lower()
+    try:
+        timeframe = request.args.get("timeframe", "all")
+        if timeframe not in ["all", "30", "90", "180", "365"]:
+            timeframe = "all"
+
+        try:
+            min_yield = float(request.args.get("min_yield", 0.0))
+            if min_yield < 0 or min_yield > 100:
+                min_yield = 0.0
+        except (ValueError, TypeError):
+            min_yield = 0.0
+
+        search_query = request.args.get("search", "").strip().lower()
+        if len(search_query) > 100:
+            search_query = search_query[:100]
+    except Exception:
+        return jsonify({"status": "error", "message": "Invalid query parameters"}), 400
 
     # Get cached or fresh dividends
     all_divs = manager.get_all_dividends()
@@ -131,6 +162,11 @@ def refresh_data():
 @app.route("/api/stock/<identifier>/history")
 def stock_history(identifier):
     """Fetch company's complete multi-year dividend track record."""
+    # Validate identifier to prevent path traversal or oversized requests
+    identifier = identifier.strip()
+    if len(identifier) > 50 or any(char in identifier for char in ['/', '\\', '..']):
+        return jsonify({"status": "error", "message": "Invalid identifier"}), 400
+
     history = manager.get_complete_dividend_history(identifier)
     isin = isin_resolver.get_isin(identifier) if not identifier.startswith("INE") else identifier
     return jsonify({
@@ -180,5 +216,7 @@ def export_csv():
     )
 
 if __name__ == "__main__":
+    # Production safety: debug must be False.
+    # Railway provides the PORT environment variable automatically.
     print(f"🚀 Dividend Scanner Dashboard running at http://{SERVER_HOST}:{SERVER_PORT}")
-    app.run(host=SERVER_HOST, port=SERVER_PORT, debug=True)
+    app.run(host=SERVER_HOST, port=SERVER_PORT, debug=False)

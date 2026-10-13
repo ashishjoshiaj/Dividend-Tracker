@@ -15,8 +15,9 @@ class UpstoxClient:
         self.token = token or UPSTOX_TOKEN or load_env().get("TOKEN", "")
 
     def reload_token(self):
-        """Reload token from .env file."""
-        self.token = load_env().get("TOKEN", "")
+        """Reload token from environment variable or .env file."""
+        import os
+        self.token = os.environ.get("TOKEN") or load_env().get("TOKEN", "")
 
     def _headers(self) -> Dict[str, str]:
         return {
