@@ -571,6 +571,20 @@ body {
     display: inline-block;
 }
 
+.symbol-clickable {
+    cursor: pointer;
+    transition: color 0.15s ease;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+}
+
+.symbol-clickable:hover {
+    color: #e4e4e7;
+    text-decoration-color: #a1a1aa;
+}
+
 .company-meta {
     display: flex;
     flex-direction: column;

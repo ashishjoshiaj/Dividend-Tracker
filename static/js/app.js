@@ -278,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
             tr.innerHTML = `
                 <td>
                     <div class="stock-identity">
-                        <span class="symbol-badge" title="${escapeHtml(stock.company_name || stock.symbol)}">${escapeHtml(stock.symbol)}</span>
+                        <span class="symbol-badge symbol-clickable" title="Click to view ${escapeHtml(stock.company_name || stock.symbol)} details">${escapeHtml(stock.symbol)}</span>
                     </div>
                 </td>
                 <td class="price-cell">
@@ -318,6 +318,10 @@ document.addEventListener("DOMContentLoaded", () => {
             // Action button listener
             const actionBtn = tr.querySelector(".action-btn");
             actionBtn.addEventListener("click", () => openCompanyModal(stock));
+
+            // Symbol badge click — same modal as History
+            const symbolBadge = tr.querySelector(".symbol-clickable");
+            symbolBadge.addEventListener("click", () => openCompanyModal(stock));
 
             tableBody.appendChild(tr);
         });
