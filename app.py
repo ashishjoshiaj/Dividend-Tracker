@@ -88,7 +88,7 @@ def get_dividends():
     """Fetch dividends with optional filtering by timeframe, yield, and search."""
     try:
         timeframe = request.args.get("timeframe", "all")
-        if timeframe not in ["all", "30", "90", "180", "365"]:
+        if timeframe not in ["all", "recent", "5", "10", "20", "30", "45", "60", "75", "90", "180", "365"]:
             timeframe = "all"
 
         try:
